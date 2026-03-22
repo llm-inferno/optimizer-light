@@ -73,42 +73,42 @@ The following data is needed by the Optimizer (Declarations described [types](..
     ```json
     {
         "models": [
-            {
-            "name": "granite_13b",
-            "acc": "A100",
-            "accCount": 1,
-            "maxBatchSize": 32,
-            "atTokens": 512,
-            "perfParms": {
-                "alpha": 20.58,
-                "beta": 0.41,
-                "gamma": 0.0021
-            }
-            },
-            {
-            "name": "granite_13b",
-            "acc": "G2",
-            "accCount": 1,
-            "maxBatchSize": 38,
-            "atTokens": 512,
-            "perfParms": {
-                "alpha": 17.15,
-                "beta": 0.34,
-                "gamma": 0.0017
-            }
-            },
-            {
-            "name": "llama_70b",
-            "acc": "G2",
-            "accCount": 2,
-            "maxBatchSize": 6,
-            "atTokens": 512,
-            "perfParms": {
-                "alpha": 22.84,
-                "beta": 5.89,
-                "gamma": 0.0295
-            }
-            }
+                {
+                "name": "granite_13b",
+                "acc": "A100",
+                "accCount": 1,
+                "maxBatchSize": 64,
+                "atTokens": 512,
+                "perfParms": {
+                    "alpha": 20.58,
+                    "beta": 0.41,
+                    "gamma": 0.00128125
+                    }
+                },
+                {
+                "name": "granite_13b",
+                "acc": "G2",
+                "accCount": 1,
+                "maxBatchSize": 76,
+                "atTokens": 512,
+                "perfParms": {
+                    "alpha": 17.15,
+                    "beta": 0.34,
+                    "gamma": 0.0010625
+                    }
+                },
+                {
+                "name": "llama_70b",
+                "acc": "G2",
+                "accCount": 4,
+                "maxBatchSize": 12,
+                "atTokens": 512,
+                "perfParms": {
+                    "alpha": 22.84,
+                    "beta": 5.89,
+                    "gamma": 0.01840625
+                    }
+                }
         ]
     }
     ```
