@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"math"
 
-	"github.com/llm-inferno/optimizer-light/pkg/analyzer"
 	"github.com/llm-inferno/optimizer-light/pkg/config"
+	"github.com/llm-inferno/queue-analysis/pkg/analyzer"
 )
 
 // Allocation details of an accelerator to a server
@@ -89,25 +89,21 @@ func CreateAllocation(serverName string, gName string) *Allocation {
 	// create queue analyzer
 	qConfig := &analyzer.Configuration{
 		MaxBatchSize: N,
+		MaxNumTokens: config.DefaultMaxNumTokens,
 		MaxQueueSize: maxQueue,
 		ServiceParms: &analyzer.ServiceParms{
-			Prefill: &analyzer.PrefillParms{
-				Gamma: perf.PrefillParms.Gamma,
-				Delta: perf.PrefillParms.Delta,
-			},
-			Decode: &analyzer.DecodeParms{
-				Alpha: perf.DecodeParms.Alpha,
-				Beta:  perf.DecodeParms.Beta,
-			},
+			Alpha: perf.PerfParms.Alpha,
+			Beta:  perf.PerfParms.Beta,
+			Gamma: perf.PerfParms.Gamma,
 		},
 	}
 
 	requestData := &analyzer.RequestSize{
-		AvgInputTokens:  load.AvgInTokens,
-		AvgOutputTokens: K,
+		AvgInputTokens:  float32(load.AvgInTokens),
+		AvgOutputTokens: float32(K),
 	}
 
-	queueAnalyzer, err := analyzer.NewQueueAnalyzer(qConfig, requestData)
+	queueAnalyzer, err := analyzer.NewLLMQueueAnalyzer(qConfig, requestData)
 	if err != nil {
 		fmt.Println(err)
 		return nil
@@ -153,7 +149,7 @@ func CreateAllocation(serverName string, gName string) *Allocation {
 	}
 	rho := metrics.Rho
 	itl := metrics.AvgTokenTime
-	ttft := metrics.AvgWaitTime + metrics.AvgPrefillTime
+	ttft := metrics.AvgTTFT
 	// fmt.Printf("numReplicas=%d; batchSize=%d; rate=%v, itl=%v; ttft=%v; \n", numReplicas, N, rate, itl, ttft)
 
 	alloc := &Allocation{accelerator: gName, numReplicas: numReplicas, batchSize: N,
@@ -275,9 +271,9 @@ func zeroLoadAllocation(server *Server, model *Model, acc *Accelerator, perf *co
 	cost := acc.Cost() * float32(totalNumInstances)
 
 	//TODO: maxArrvRatePerReplica seems to be meaningless
-	decodeTime := perf.DecodeParms.Alpha + perf.DecodeParms.Beta
-	maxDecodeTime := perf.DecodeParms.Alpha + perf.DecodeParms.Beta*float32(maxBatchSize)
-	prefillTime := perf.PrefillParms.Gamma + perf.PrefillParms.Delta
+	decodeTime := perf.PerfParms.Alpha + perf.PerfParms.Beta
+	maxDecodeTime := perf.PerfParms.Alpha + perf.PerfParms.Beta*float32(maxBatchSize)
+	prefillTime := decodeTime + perf.PerfParms.Gamma*float32(maxBatchSize)
 	maxServTime := prefillTime + maxDecodeTime
 	maxArrvRatePerReplica := float32(maxBatchSize) / maxServTime
 
