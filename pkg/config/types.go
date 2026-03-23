@@ -72,6 +72,14 @@ type ModelAcceleratorPerfData struct {
 
 // Parameters for estimating decode and prefill times
 // iterationTime = alpha + beta * computed tokens + gamma * transferred tokens (msec)
+// - alpha: represents the baseline time per iteration irrespective of batch composition,
+// accounting for overheads such as kernel launch latencies, synchronization barriers, and time
+// to load model weights.
+// - beta: captures the compute time per token during the forward pass reflecting the time spent
+// on matrix multiplications and other linear operations, and is primarily governed by the
+// accelerator's peak floating-point throughput.
+// - gamma: represents the KV cache memoryaccess time per token, governed by the accelerator's
+// memory bandwidth.
 type PerfParms struct {
 	Alpha float32 `json:"alpha"` // base overhead
 	Beta  float32 `json:"beta"`  // compute time scaling

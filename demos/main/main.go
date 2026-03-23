@@ -108,7 +108,7 @@ func main() {
 	if byteValue, err := json.Marshal(allocationSolution); err != nil {
 		fmt.Println(err)
 	} else {
-		os.WriteFile(fn_sol, byteValue, 0644)
+		_ = os.WriteFile(fn_sol, byteValue, 0644)
 	}
 
 	fmt.Printf("%v", system)

@@ -34,5 +34,5 @@ func (server *BaseServer) Run() {
 	if p := os.Getenv(RestPortEnvName); p != "" {
 		port = p
 	}
-	server.router.Run(host + ":" + port)
+	_ = server.router.Run(host + ":" + port)
 }

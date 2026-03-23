@@ -122,6 +122,7 @@ func main() {
 	atTokens := 512
 
 	batchSizeFactor := 2
+	betaFactor := float32(10)
 	gammaFactor := float32(320)
 
 	// select using masks
@@ -156,7 +157,7 @@ func main() {
 				AtTokens:     atTokens,
 				PerfParms: config.PerfParms{
 					Alpha: alpha[j][i],
-					Beta:  beta[j][i],
+					Beta:  beta[j][i] / betaFactor,
 					Gamma: beta[j][i] / gammaFactor,
 				},
 			}

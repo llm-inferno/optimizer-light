@@ -81,7 +81,7 @@ The following data is needed by the Optimizer (Declarations described [types](..
                 "atTokens": 512,
                 "perfParms": {
                     "alpha": 20.58,
-                    "beta": 0.41,
+                    "beta": 0.041,
                     "gamma": 0.00128125
                     }
                 },
@@ -93,7 +93,7 @@ The following data is needed by the Optimizer (Declarations described [types](..
                 "atTokens": 512,
                 "perfParms": {
                     "alpha": 17.15,
-                    "beta": 0.34,
+                    "beta": 0.034,
                     "gamma": 0.0010625
                     }
                 },
@@ -105,7 +105,7 @@ The following data is needed by the Optimizer (Declarations described [types](..
                 "atTokens": 512,
                 "perfParms": {
                     "alpha": 22.84,
-                    "beta": 5.89,
+                    "beta": 0.589,
                     "gamma": 0.01840625
                     }
                 }

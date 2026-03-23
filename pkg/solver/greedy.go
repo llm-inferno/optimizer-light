@@ -39,7 +39,7 @@ func (s *Solver) SolveGreedy() {
 	maps.Copy(available, core.GetCapacities())
 
 	// create entries for all servers, sorting candidate allocations per server
-	var entries []*serverEntry = make([]*serverEntry, 0)
+	entries := make([]*serverEntry, 0)
 	for serverName, server := range core.GetServers() {
 		server.RemoveAllocation()
 		allAllocs := server.AllAllocations()
