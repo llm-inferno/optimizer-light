@@ -1,8 +1,6 @@
 package rest
 
 import (
-	"os"
-
 	"github.com/gin-gonic/gin"
 	"github.com/llm-inferno/optimizer-light/pkg/core"
 )
@@ -22,17 +20,9 @@ func NewBaseServer() *BaseServer {
 }
 
 // start server
-func (server *BaseServer) Run() {
+func (server *BaseServer) Run(host, port string) {
 	// instantiate a clean system
 	system = core.NewSystem()
 
-	host := ""
-	port := "8080"
-	if h := os.Getenv(RestHostEnvName); h != "" {
-		host = h
-	}
-	if p := os.Getenv(RestPortEnvName); p != "" {
-		port = p
-	}
 	_ = server.router.Run(host + ":" + port)
 }

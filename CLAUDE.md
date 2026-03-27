@@ -34,6 +34,13 @@ go test ./pkg/analyzer/...
 docker build -t inferno-optimizer-light . --load
 ```
 
+## Service environment variables
+
+| Variable | Purpose | Default |
+|---|---|---|
+| `INFERNO_HOST` | REST server listen address | `""` (all interfaces) |
+| `INFERNO_PORT` | REST server listen port | `8080` |
+
 ## Architecture
 
 ### Data Flow

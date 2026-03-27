@@ -8,6 +8,10 @@ package rest
 const RestHostEnvName = "INFERNO_HOST"
 const RestPortEnvName = "INFERNO_PORT"
 
+// REST server defaults
+const DefaultRestHost = ""
+const DefaultRestPort = "8080"
+
 /**
  * Parameters
  */

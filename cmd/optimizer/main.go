@@ -9,6 +9,15 @@ import (
 // create and run a REST API Optimizer server
 //   - stateless (default) or statefull (with -F argument)
 func main() {
+	host := os.Getenv(rest.RestHostEnvName)
+	if host == "" {
+		host = rest.DefaultRestHost
+	}
+	port := os.Getenv(rest.RestPortEnvName)
+	if port == "" {
+		port = rest.DefaultRestPort
+	}
+
 	var server rest.RESTServer
 	statefull := len(os.Args) > 1 && os.Args[1] == rest.DefaultStatefull
 	if statefull {
@@ -16,5 +25,5 @@ func main() {
 	} else {
 		server = rest.NewStateLessServer()
 	}
-	server.Run()
+	server.Run(host, port)
 }
