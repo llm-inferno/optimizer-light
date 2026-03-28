@@ -1,5 +1,5 @@
 # Use a multi-stage build
-FROM golang:alpine AS builder
+FROM golang:1.25-alpine AS builder
 RUN apk update
 
 WORKDIR /app
@@ -13,7 +13,7 @@ RUN for file in $(find cmd -name "main.go"); do \
   done
 
 # Create the final image
-FROM alpine
+FROM alpine:3.20
 RUN apk update
 COPY --from=builder /app/bin /bin
 
