@@ -196,6 +196,7 @@ The following data is needed by the Optimizer (Declarations described [types](..
                     "ttftAverage": 726.5,
                     "load": {
                         "arrivalRate": 100,
+                        "throughput": 100,
                         "avgInTokens": 128,
                         "avgOutTokens": 999
                     }
@@ -209,6 +210,7 @@ The following data is needed by the Optimizer (Declarations described [types](..
                     "ttftAverage": 102.09766,
                     "load": {
                         "arrivalRate": 60,
+                        "throughput": 60,
                         "avgInTokens": 96,
                         "avgOutTokens": 1024
                     }
@@ -257,6 +259,7 @@ The output of the Optimizer is an Allocation Solution, in addition to updating t
             "ttftAverage": 102.09766,
             "load": {
                 "arrivalRate": 60,
+                "throughput": 60,
                 "avgInTokens": 96,
                 "avgOutTokens": 1024
             }
