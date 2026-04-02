@@ -4,7 +4,7 @@ go 1.24.0
 
 require (
 	github.com/gin-gonic/gin v1.11.0
-	github.com/llm-inferno/queue-analysis v0.3.0
+	github.com/llm-inferno/queue-analysis v0.4.0
 )
 
 require (
