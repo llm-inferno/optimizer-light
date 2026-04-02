@@ -136,7 +136,8 @@ type AllocationData struct {
 
 // Specifications of server load statistics
 type ServerLoadSpec struct {
-	ArrivalRate  float32 `json:"arrivalRate"`  // req/min
+	ArrivalRate  float32 `json:"arrivalRate"`  // offered arrival rate (req/min)
+	Throughput   float32 `json:"throughput"`   // effective throughput / goodput (req/min); equals ArrivalRate when not overloaded
 	AvgInTokens  int     `json:"avgInTokens"`  // average number of input tokens
 	AvgOutTokens int     `json:"avgOutTokens"` // average number of output tokens
 }
