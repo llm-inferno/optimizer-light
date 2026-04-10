@@ -74,7 +74,9 @@ func CreateAllocation(serverName string, gName string) *Allocation {
 		return zeroLoadAllocation(server, model, acc, perf)
 	}
 
-	// guard: skip this model/accelerator combination if perfParms are uninitialized
+	// guard: perfParms all-zero means the tuner has not yet converged;
+	// skip to avoid passing zero alpha/beta/gamma into the queue analyzer
+	// (which would produce degenerate/+Inf queue metrics or an infinite loop).
 	if perf.PerfParms.Alpha == 0 && perf.PerfParms.Beta == 0 && perf.PerfParms.Gamma == 0 {
 		return nil
 	}

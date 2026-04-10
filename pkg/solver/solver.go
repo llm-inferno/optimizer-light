@@ -4,6 +4,8 @@ import (
 	"bytes"
 	"fmt"
 	"math"
+	"sort"
+	"strings"
 
 	"github.com/llm-inferno/optimizer-light/pkg/config"
 	"github.com/llm-inferno/optimizer-light/pkg/core"
@@ -48,12 +50,21 @@ func (s *Solver) Solve() error {
 	// TODO: cleanup after trying MIP solver
 
 	s.diffAllocation = make(map[string]*core.AllocationDiff)
+	var unresolved []string
 	for serverName, server := range core.GetServers() {
 		curAlloc := s.currentAllocation[serverName]
 		desiredAlloc := server.Allocation()
 		if allocDiff := core.CreateAllocationDiff(curAlloc, desiredAlloc); allocDiff != nil {
 			s.diffAllocation[serverName] = allocDiff
 		}
+		if desiredAlloc == nil {
+			unresolved = append(unresolved, serverName)
+		}
+	}
+	// return error if any server could not be allocated
+	if len(unresolved) > 0 {
+		sort.Strings(unresolved)
+		return fmt.Errorf("no feasible allocation for servers: [%s]", strings.Join(unresolved, ", "))
 	}
 	return nil
 }
