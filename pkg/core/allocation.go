@@ -74,6 +74,13 @@ func CreateAllocation(serverName string, gName string) *Allocation {
 		return zeroLoadAllocation(server, model, acc, perf)
 	}
 
+	// guard: perfParms all-zero means the tuner has not yet converged;
+	// skip to avoid passing zero alpha/beta/gamma into the queue analyzer
+	// (which would produce degenerate/+Inf queue metrics or an infinite loop).
+	if perf.PerfParms.Alpha == 0 && perf.PerfParms.Beta == 0 && perf.PerfParms.Gamma == 0 {
+		return nil
+	}
+
 	// calculate max batch size (N) based on average request length (K)
 	K := load.AvgOutTokens
 
@@ -181,6 +188,9 @@ func (a *Allocation) Scale(serverName string) (alloc *Allocation, inc int) {
 
 	// create new allocation
 	alloc = CreateAllocation(serverName, gName)
+	if alloc == nil {
+		return nil, 0
+	}
 	inc = alloc.numReplicas - a.numReplicas
 	return alloc, inc
 }
@@ -275,7 +285,10 @@ func zeroLoadAllocation(server *Server, model *Model, acc *Accelerator, perf *co
 	maxDecodeTime := perf.PerfParms.Alpha + perf.PerfParms.Beta*float32(maxBatchSize)
 	prefillTime := decodeTime + perf.PerfParms.Gamma*float32(maxBatchSize)
 	maxServTime := prefillTime + maxDecodeTime
-	maxArrvRatePerReplica := float32(maxBatchSize) / maxServTime
+	maxArrvRatePerReplica := float32(0)
+	if maxServTime > 0 {
+		maxArrvRatePerReplica = float32(maxBatchSize) / maxServTime
+	}
 
 	alloc := &Allocation{accelerator: gName, numReplicas: numReplicas, batchSize: maxBatchSize,
 		cost: cost, itl: decodeTime, ttft: prefillTime, rho: 0, maxArrvRatePerReplica: maxArrvRatePerReplica}

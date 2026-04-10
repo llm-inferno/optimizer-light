@@ -79,6 +79,13 @@ For each (Server, Accelerator) candidate:
 3. `QueueAnalyzer.Analyze(rate)` computes expected metrics for the solution.
 4. Infeasible if no batch size meets SLOs or GPU count × replicas exceeds available capacity.
 
+**Robustness guards:**
+- **Zero perfParms guard** (`CreateAllocation`): returns `nil` immediately when `Alpha == Beta == Gamma == 0`. All-zero parameters mean the EKF tuner has not yet provided valid values; passing them to the queue analyzer causes an infinite loop (service rate = +Inf → binary search never converges). The nil return causes the server/accelerator pair to be skipped.
+- **`Scale()` nil guard**: checks for a `nil` return from `CreateAllocation` before dereferencing; returns `(nil, 0)`.
+- **div-by-zero in `zeroLoadAllocation`**: `maxArrvRatePerReplica` is set to `0` when `maxServTime == 0`, preventing `+Inf` from entering the queue model.
+
+`Solver.Solve()` returns `fmt.Errorf("no feasible allocation for servers: [%s]", ...)` when any server has no feasible allocation after all candidates are evaluated. This error propagates through `Manager.Optimize()` to the REST layer (HTTP 404).
+
 ### REST API Modes
 
 **Stateless** (default): Single endpoint `/optimizeOne` accepts a full `SystemSpec` + optimizer params, returns solution. No state persists.
@@ -94,3 +101,13 @@ Six JSON files per dataset in `sample-data/{small,large}/`:
 - `serviceclasses.json` — SLO definitions (ITL, TTFT, TPS targets per model)
 - `capacity.json` — available GPU counts by type
 - `optimizer.json` — optimizer settings (mode, batch sizes to try)
+
+## Testing
+
+```bash
+go test ./...
+```
+
+Key test files:
+- `pkg/core/allocation_test.go` — white-box tests for `CreateAllocation`: zero perfParms with non-zero load returns nil; zero perfParms with zero load returns a valid allocation (minimum replicas, no `+Inf` values).
+- `pkg/solver/solver_test.go` — black-box tests for `Solver.Solve()`: zero perfParms returns an error in both unlimited and greedy modes; valid perfParms returns nil.
