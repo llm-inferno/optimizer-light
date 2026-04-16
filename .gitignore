@@ -17,3 +17,6 @@ vendor/
 # Miscellaneous
 .DS_Store
 ~*
+
+# Git worktrees
+.worktrees/

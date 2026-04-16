@@ -91,7 +91,7 @@ func CreateAllocation(serverName string, gName string) *Allocation {
 	} else {
 		N = max(perf.MaxBatchSize*perf.AtTokens/K, 1)
 	}
-	maxQueue := N * config.MaxQueueToBatchRatio
+	maxQueue := server.maxQueueSize
 
 	// create queue analyzer
 	qConfig := &analyzer.Configuration{

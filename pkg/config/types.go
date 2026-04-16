@@ -119,6 +119,7 @@ type ServerSpec struct {
 	KeepAccelerator bool           `json:"keepAccelerator"` // option to not change accelerator
 	MinNumReplicas  int            `json:"minNumReplicas"`  // minimum number of replicas
 	MaxBatchSize    int            `json:"maxBatchSize"`    // overriding value for the maximum batch size
+	MaxQueueSize    int            `json:"maxQueueSize"`    // maximum external queue size (0 = no external queue)
 	CurrentAlloc    AllocationData `json:"currentAlloc"`    // current allocation
 	DesiredAlloc    AllocationData `json:"desiredAlloc"`    // desired allocation
 }
