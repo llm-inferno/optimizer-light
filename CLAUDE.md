@@ -31,7 +31,7 @@ go test ./pkg/solver/...
 go test ./pkg/analyzer/...
 
 # Build Docker image
-docker build -t inferno-optimizer-light . --load
+docker build -t quay.io/atantawi/inferno-optimizer-light:latest . --load
 ```
 
 ## Service environment variables

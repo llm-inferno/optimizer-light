@@ -7,7 +7,7 @@ The light optimizer provided in this repository uses a simple greedy algorithm, 
 ## Building
 
 ```bash
-docker build -t  inferno-optimizer-light . --load
+docker build -t quay.io/atantawi/inferno-optimizer-light:latest . --load
 ```
 
 ## Running
