@@ -17,6 +17,10 @@ var SLOMargin = -float32(math.Log(1 - SLOPercentile))
 // default maximum number of tokens in a batch (passed to LLMQueueAnalyzer)
 const DefaultMaxNumTokens = 8192
 
+// default upper bound (search ceiling) for the optimal-concurrency search;
+// used when a (model,accelerator)'s perf.MaxBatchSize is 0/unset
+const DefaultConcurrencyCeiling = 256
+
 // accelerator transition penalty factor
 var AccelPenaltyFactor = float32(0.1)
 

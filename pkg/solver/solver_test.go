@@ -10,7 +10,7 @@ import (
 
 // newSolverTestSystem builds a system identical to Task 1's newTestSystem,
 // but exposed here since solver_test is an external test package.
-func newSolverTestSystem(perfParms config.PerfParms, arrivalRate float32) {
+func newSolverTestSystem(perfParms config.PerfParms, maxBatchSize int, arrivalRate float32) {
 	sys := core.NewSystem()
 	core.TheSystem = sys
 
@@ -24,7 +24,7 @@ func newSolverTestSystem(perfParms config.PerfParms, arrivalRate float32) {
 	})
 	sys.SetModelsFromSpec(&config.ModelData{
 		PerfData: []config.ModelAcceleratorPerfData{
-			{Name: "m1", Acc: "H100", AccCount: 1, MaxBatchSize: 16, AtTokens: 512,
+			{Name: "m1", Acc: "H100", AccCount: 1, MaxBatchSize: maxBatchSize,
 				PerfParms: perfParms},
 		},
 	})
@@ -55,7 +55,7 @@ func newSolverTestSystem(perfParms config.PerfParms, arrivalRate float32) {
 // When a server has no valid allocations (zero perfParms + non-zero load),
 // Solve() must return a non-nil error naming the unresolved server.
 func TestSolve_ZeroPerfParms_ReturnsError(t *testing.T) {
-	newSolverTestSystem(config.PerfParms{Alpha: 0, Beta: 0, Gamma: 0}, 60)
+	newSolverTestSystem(config.PerfParms{Alpha: 0, Beta: 0, Gamma: 0}, 256, 60)
 	s := solver.NewSolver(&config.OptimizerSpec{Unlimited: true})
 	err := s.Solve()
 	if err == nil {
@@ -65,7 +65,7 @@ func TestSolve_ZeroPerfParms_ReturnsError(t *testing.T) {
 
 // When a server has valid perfParms and load, Solve() must return nil (success).
 func TestSolve_ValidPerfParms_ReturnsNil(t *testing.T) {
-	newSolverTestSystem(config.PerfParms{Alpha: 1.5, Beta: 0.002, Gamma: 0.0001}, 60)
+	newSolverTestSystem(config.PerfParms{Alpha: 1.5, Beta: 0.002, Gamma: 0.0001}, 256, 60)
 	s := solver.NewSolver(&config.OptimizerSpec{Unlimited: true})
 	err := s.Solve()
 	if err != nil {
@@ -76,7 +76,7 @@ func TestSolve_ValidPerfParms_ReturnsNil(t *testing.T) {
 // When a server has no valid allocations and the greedy solver is used,
 // Solve() must also return a non-nil error naming the unresolved server.
 func TestSolveGreedy_ZeroPerfParms_ReturnsError(t *testing.T) {
-	newSolverTestSystem(config.PerfParms{Alpha: 0, Beta: 0, Gamma: 0}, 60)
+	newSolverTestSystem(config.PerfParms{Alpha: 0, Beta: 0, Gamma: 0}, 256, 60)
 	s := solver.NewSolver(&config.OptimizerSpec{Unlimited: false})
 	err := s.Solve()
 	if err == nil {

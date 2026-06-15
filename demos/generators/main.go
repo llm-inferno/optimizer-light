@@ -71,30 +71,6 @@ func main() {
 		{0.13, 0.16, 0.26, 0.20, 0.27, 0.18, 2.21, 0.13, 1.88},
 	}
 
-	maxBatchSize := [][]int{
-		{51, 38, 19, 102, 51, 25, 8, 102, 12},
-		{9, 7, 3, 19, 9, 4, 1, 19, 2},
-		{19, 14, 7, 38, 19, 9, 3, 38, 4},
-		{25, 19, 9, 51, 25, 12, 4, 51, 6},
-		{32, 24, 12, 64, 32, 16, 5, 64, 8},
-		{38, 28, 14, 76, 38, 19, 6, 76, 9},
-		{51, 38, 19, 102, 51, 25, 8, 102, 12},
-		{32, 24, 12, 64, 32, 16, 5, 64, 8},
-		{76, 57, 28, 153, 76, 38, 12, 153, 19},
-		{51, 38, 19, 102, 51, 25, 8, 102, 12},
-		{25, 19, 9, 51, 25, 12, 4, 51, 6},
-		{32, 24, 12, 64, 32, 16, 5, 64, 8},
-		{38, 28, 14, 76, 38, 19, 6, 76, 9},
-		{51, 38, 19, 102, 51, 25, 8, 102, 12},
-		{32, 24, 12, 64, 32, 16, 5, 64, 8},
-		{76, 57, 28, 153, 76, 38, 12, 153, 19},
-		{51, 38, 19, 102, 51, 25, 8, 102, 13},
-		{25, 19, 9, 51, 25, 13, 4, 51, 6},
-		{32, 24, 12, 64, 32, 16, 5, 64, 8},
-		{38, 29, 14, 77, 38, 19, 6, 77, 9},
-		{51, 38, 19, 102, 51, 25, 8, 102, 13},
-	}
-
 	count := [][]int{
 		{1, 1, 1, 1, 1, 1, 2, 1, 2},
 		{2, 4, 4, 1, 2, 4, 8, 1, 8},
@@ -119,9 +95,6 @@ func main() {
 		{1, 1, 1, 1, 1, 1, 1, 1, 1},
 	}
 
-	atTokens := 512
-
-	batchSizeFactor := 2
 	betaFactor := float32(10)
 	gammaFactor := float32(320)
 
@@ -136,7 +109,6 @@ func main() {
 
 		alpha = MaskMatrix(alpha, accMask, modMask)
 		beta = MaskMatrix(beta, accMask, modMask)
-		maxBatchSize = MaskMatrix(maxBatchSize, accMask, modMask)
 		count = MaskMatrix(count, accMask, modMask)
 	}
 
@@ -153,8 +125,7 @@ func main() {
 				Name:         n,
 				Acc:          a,
 				AccCount:     count[j][i],
-				MaxBatchSize: maxBatchSize[j][i] * batchSizeFactor,
-				AtTokens:     atTokens,
+				MaxBatchSize: config.DefaultConcurrencyCeiling,
 				PerfParms: config.PerfParms{
 					Alpha: alpha[j][i],
 					Beta:  beta[j][i] / betaFactor,

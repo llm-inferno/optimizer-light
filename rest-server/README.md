@@ -77,8 +77,7 @@ The following data is needed by the Optimizer (Declarations described [types](..
                 "name": "granite_13b",
                 "acc": "A100",
                 "accCount": 1,
-                "maxBatchSize": 64,
-                "atTokens": 512,
+                "maxBatchSize": 256,
                 "perfParms": {
                     "alpha": 20.58,
                     "beta": 0.041,
@@ -89,8 +88,7 @@ The following data is needed by the Optimizer (Declarations described [types](..
                 "name": "granite_13b",
                 "acc": "G2",
                 "accCount": 1,
-                "maxBatchSize": 76,
-                "atTokens": 512,
+                "maxBatchSize": 256,
                 "perfParms": {
                     "alpha": 17.15,
                     "beta": 0.034,
@@ -101,8 +99,7 @@ The following data is needed by the Optimizer (Declarations described [types](..
                 "name": "llama_70b",
                 "acc": "G2",
                 "accCount": 4,
-                "maxBatchSize": 12,
-                "atTokens": 512,
+                "maxBatchSize": 256,
                 "perfParms": {
                     "alpha": 22.84,
                     "beta": 0.589,
@@ -116,8 +113,7 @@ The following data is needed by the Optimizer (Declarations described [types](..
     Performance data includes
 
    - `accCount`: number of accelerator (cards)
-   - `maxBatchSize`: maximum batch size to use, beyond which performance deteriorates
-   - `atTokens`: average number of tokens used when determining the `maxBatchSize`
+   - `maxBatchSize`: search ceiling (max concurrency) for the optimal-concurrency search that sizes each server; `0` uses the default ceiling (256). An explicit per-server `maxBatchSize` override (in server data) bypasses the search.
    - `perfParms`: performance parameters `alpha`, `beta`, and `gamma` (in msec) of the linear approximation of iteration time as a function of computed tokens and transferred tokens per batch (n), *iterationTime = alpha + beta . computedTokens + gamma . transferredTokens*
 
 1. **Service class data**: For all service classes, the specification, such as name, priority, and SLO targets for a service class. An example follows.
