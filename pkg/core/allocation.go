@@ -81,33 +81,66 @@ func CreateAllocation(serverName string, gName string) *Allocation {
 		return nil
 	}
 
-	// calculate max batch size (N) based on average request length (K)
+	// average request output length
 	K := load.AvgOutTokens
-
-	// use maxBatchSize from configured value or scaled performance data
-	var N int
-	if server.maxBatchSize > 0 {
-		N = server.maxBatchSize
-	} else {
-		N = max(perf.MaxBatchSize*perf.AtTokens/K, 1)
-	}
 	maxQueue := server.maxQueueSize
 
-	// create queue analyzer
+	serviceParms := &analyzer.ServiceParms{
+		Alpha: perf.PerfParms.Alpha,
+		Beta:  perf.PerfParms.Beta,
+		Gamma: perf.PerfParms.Gamma,
+	}
+	requestData := &analyzer.RequestSize{
+		AvgInputTokens:  float32(load.AvgInTokens),
+		AvgOutputTokens: float32(K),
+	}
+	targetPerf := &analyzer.TargetPerf{
+		TargetTTFT: target.TTFT,
+		TargetITL:  target.ITL,
+		TargetTPS:  target.TPS,
+	}
+
+	// determine max batch size (concurrency) N
+	var N int
+	if server.maxBatchSize > 0 {
+		// explicit override: use as-is, skip the search
+		N = server.maxBatchSize
+	} else {
+		// primary path: let the queue analyzer find the optimal concurrency
+		// (smallest max batch size reaching near-peak throughput under the SLO).
+		// perf.MaxBatchSize is the search ceiling; 0 => default ceiling.
+		ceiling := perf.MaxBatchSize
+		if ceiling <= 0 {
+			ceiling = config.DefaultConcurrencyCeiling
+		}
+		searchAnalyzer, err := analyzer.NewLLMQueueAnalyzer(&analyzer.Configuration{
+			MaxBatchSize: ceiling,
+			MaxNumTokens: config.DefaultMaxNumTokens,
+			MaxQueueSize: maxQueue,
+			ServiceParms: serviceParms,
+		}, requestData)
+		if err != nil {
+			fmt.Println(err)
+			return nil
+		}
+		res, err := searchAnalyzer.OptimalConcurrency(targetPerf)
+		if err != nil {
+			fmt.Println(err)
+			return nil
+		}
+		if res == nil || !res.Feasible {
+			// SLO unachievable within [1, ceiling]; skip this candidate.
+			return nil
+		}
+		N = res.Concurrency
+	}
+
+	// create queue analyzer at the chosen concurrency N
 	qConfig := &analyzer.Configuration{
 		MaxBatchSize: N,
 		MaxNumTokens: config.DefaultMaxNumTokens,
 		MaxQueueSize: maxQueue,
-		ServiceParms: &analyzer.ServiceParms{
-			Alpha: perf.PerfParms.Alpha,
-			Beta:  perf.PerfParms.Beta,
-			Gamma: perf.PerfParms.Gamma,
-		},
-	}
-
-	requestData := &analyzer.RequestSize{
-		AvgInputTokens:  float32(load.AvgInTokens),
-		AvgOutputTokens: float32(K),
+		ServiceParms: serviceParms,
 	}
 
 	queueAnalyzer, err := analyzer.NewLLMQueueAnalyzer(qConfig, requestData)
@@ -116,19 +149,9 @@ func CreateAllocation(serverName string, gName string) *Allocation {
 		return nil
 	}
 
-	// TODO: do we need this?
-	// waitTimeLimit := target.TTFT / config.SLOMargin // distribution of waiting time assumed exponential
-
-	targetPerf := &analyzer.TargetPerf{
-		TargetTTFT: target.TTFT,
-		TargetITL:  target.ITL,
-		TargetTPS:  target.TPS,
-	}
-
 	// determine max rates to satisfy targets
 	_, metrics, _, err := queueAnalyzer.Size(targetPerf)
 	if err != nil {
-		// fmt.Println(err)
 		return nil
 	}
 	rateStar := metrics.Throughput
