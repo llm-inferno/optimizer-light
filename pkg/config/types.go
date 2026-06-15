@@ -65,8 +65,7 @@ type ModelAcceleratorPerfData struct {
 	Name         string    `json:"name"`         // model name
 	Acc          string    `json:"acc"`          // accelerator name
 	AccCount     int       `json:"accCount"`     // number of accelerator units used by model
-	MaxBatchSize int       `json:"maxBatchSize"` // max batch size based on average number of tokens per request
-	AtTokens     int       `json:"atTokens"`     // average number of tokens per request assumed in max batch size calculation
+	MaxBatchSize int       `json:"maxBatchSize"` // search ceiling (max concurrency) for the optimal-concurrency search; 0 => DefaultConcurrencyCeiling (256)
 	PerfParms    PerfParms `json:"perfParms"`    // parameters for estimating decode and prefill times
 }
 
