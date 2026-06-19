@@ -125,13 +125,14 @@ type ServerSpec struct {
 
 // Data about a server allocation
 type AllocationData struct {
-	Accelerator string         `json:"accelerator"` // accelerator name
-	NumReplicas int            `json:"numReplicas"` // number of replicas
-	MaxBatch    int            `json:"maxBatch"`    // max batch size
-	Cost        float32        `json:"cost"`        // cost of allocation
-	ITLAverage  float32        `json:"itlAverage"`  // average ITL
-	TTFTAverage float32        `json:"ttftAverage"` // average TTFT
-	Load        ServerLoadSpec `json:"load"`        // server load statistics
+	Accelerator    string         `json:"accelerator"`    // accelerator name
+	NumReplicas    int            `json:"numReplicas"`    // number of replicas
+	MaxBatch       int            `json:"maxBatch"`       // max batch size
+	Cost           float32        `json:"cost"`           // cost of allocation
+	ITLAverage     float32        `json:"itlAverage"`     // average ITL
+	TTFTAverage    float32        `json:"ttftAverage"`    // average TTFT
+	AvgConcurrency float32        `json:"avgConcurrency"` // average in-service occupancy (Little's Law: throughput × in-service time); observability passthrough — the optimizer does not read or emit it
+	Load           ServerLoadSpec `json:"load"`           // server load statistics
 }
 
 // Specifications of server load statistics
